@@ -7,6 +7,7 @@
   <title>Тест</title>
   <meta property="og:title" content="Тест">
   <meta name="twitter:title" content="Тест">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,7 +17,6 @@
       <section class="identity panel">
         <label for="studentName">ИМЯ ФАМИЛИЯ <span class="required">*</span></label>
         <input id="studentName" name="studentName" type="text" autocomplete="name" placeholder="Введите имя и фамилию" required>
-        <p class="field-hint">Эти данные будут записаны вместе с результатом.</p>
       </section>
 
       <div id="quiz" aria-live="polite"></div>
@@ -25,12 +25,10 @@
         <div class="progress-line"><span id="progressText">0 из 19 отвечено</span><span id="progressPercent">0%</span></div>
         <div class="progress-track"><span id="progressBar"></span></div>
         <button class="finish-button" id="finishButton" type="button"><span>Завершить досрочно</span><span aria-hidden="true">↗</span></button>
-        <p class="submit-note">Ответы можно отправить в любой момент. Пропущенные задания будут отмечены в результатах.</p>
       </section>
     </form>
 
     <section id="results" class="results panel" hidden></section>
-    <footer><span>ТЕСТ / учебный режим</span><span>LOCAL SESSION</span></footer>
   </main>
 
   <div id="confirmModal" class="modal-backdrop" hidden>
@@ -47,6 +45,6 @@
     <h2>Сохраняем результаты</h2>
     <p>Записываем работу в таблицу и проверяем открытые ответы.</p>
   </div>
-  <script src="app.js?v=828d924"></script>
+  <script src="app.js?v=ui-20261005-3"></script>
 </body>
 </html>
