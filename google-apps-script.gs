@@ -4,9 +4,13 @@ const AI_BASE_URL = 'http://111.228.46.150:3000/v1';
 const AI_API_KEY = 'sk-BtsZuSh7mCzjwPmke9ZzuCqnJPOucf6KXfHrdrVtglpNjYdm';
 const AI_MODEL = 'wj-interpret';
 
+function doGet() {
+  return json_({ok: true, service: 'octal-quiz', sheet: SHEET_NAME});
+}
+
 function doPost(e) {
   try {
-    const data = JSON.parse(e.postData.contents || '{}');
+    const data = parseRequest_(e);
     const sheet = getSheet_();
     ensureHeaders_(sheet);
     if (data.action === 'ai-review') return processAiReview_(sheet, data);
@@ -28,6 +32,22 @@ function doPost(e) {
     return json_({ok: true, saved: true});
   } catch (error) {
     return json_({ok: false, error: String(error)});
+  }
+}
+
+function parseRequest_(e) {
+  const formPayload = e && e.parameter && e.parameter.payload;
+  const raw = formPayload || (e && e.postData && e.postData.contents) || '{}';
+  if (formPayload) return JSON.parse(formPayload);
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    const params = raw.split('&').reduce(function(result, item) {
+      const parts = item.split('=');
+      result[decodeURIComponent(parts[0])] = decodeURIComponent(parts.slice(1).join('='));
+      return result;
+    }, {});
+    return params.payload ? JSON.parse(params.payload) : {};
   }
 }
 
@@ -83,7 +103,9 @@ function checkOpenAnswers_(answers) {
       });
       const body = JSON.parse(response.getContentText());
       const text = body.choices && body.choices[0] && body.choices[0].message.content || '{}';
-      const parsed = JSON.parse(text.match(/\{[\s\S]*\}/)[0]);
+      const match = text.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error('AI did not return JSON');
+      const parsed = JSON.parse(match[0]);
       answer.isCorrect = parsed.correct === true;
     } catch (error) {
       answer.aiError = String(error);

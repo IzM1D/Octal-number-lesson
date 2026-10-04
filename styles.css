@@ -10,6 +10,13 @@ html,body{background:#000!important}
 #matrix{background:#000;opacity:.08!important}
 .panel{background:rgba(3,6,4,.96)}
 html,body{background-color:#000!important}
-#matrix{background-color:#000!important;opacity:.24!important}
+#matrix{z-index:0;background:transparent!important;background-color:transparent!important;opacity:.1!important}
+.app-shell{z-index:1}
 .modal-backdrop{display:grid!important}
 .modal-backdrop[hidden]{display:none!important}
+.loading-screen{position:fixed;inset:0;z-index:10;display:grid;place-items:center;align-content:center;gap:8px;padding:24px;background:#000;color:var(--text);text-align:center}
+.loading-screen[hidden]{display:none!important}
+.loading-screen canvas{width:180px;height:180px;margin-bottom:8px}
+.loading-kicker{color:var(--green2);font:11px ui-monospace,monospace;letter-spacing:2px}
+.loading-screen h2{margin:4px 0;font-size:26px}
+.loading-screen p{max-width:420px;margin:0;color:var(--muted);font-size:14px;line-height:1.5}

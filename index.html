@@ -40,6 +40,13 @@
       <div class="modal-actions"><button id="cancelFinish" class="button secondary" type="button">Нет, продолжить</button><button id="confirmFinish" class="button primary" type="button">Да, завершить</button></div>
     </div>
   </div>
+
+  <div id="loadingScreen" class="loading-screen" hidden aria-live="polite">
+    <canvas id="loadingCanvas" width="180" height="180" aria-hidden="true"></canvas>
+    <div class="loading-kicker">НЕЙРОПРОВЕРКА // В ПРОЦЕССЕ</div>
+    <h2>Проверяем открытые ответы</h2>
+    <p>Сохраняем работу и ждём ответ нейросети. Это может занять до одной минуты.</p>
+  </div>
   <script src="app.js"></script>
 </body>
 </html>
