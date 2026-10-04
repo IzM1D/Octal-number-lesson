@@ -11,6 +11,7 @@ function doGet() {
 function doPost(e) {
   try {
     const data = parseRequest_(e);
+    if (!data.studentName) throw new Error('Не указано имя участника');
     const sheet = getSheet_();
     ensureHeaders_(sheet);
     if (data.action === 'ai-review') return processAiReview_(sheet, data);
@@ -29,6 +30,7 @@ function doPost(e) {
     } else {
       sheet.appendRow(row);
     }
+    SpreadsheetApp.flush();
     return json_({ok: true, saved: true});
   } catch (error) {
     return json_({ok: false, error: String(error)});
