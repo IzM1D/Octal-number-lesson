@@ -9,8 +9,8 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents || '{}');
     const sheet = getSheet_();
     ensureHeaders_(sheet);
-    const aiResults = checkOpenAnswers_(data.answers || []);
-    const resultText = JSON.stringify(aiResults);
+    if (data.action === 'ai-review') return processAiReview_(sheet, data);
+    const resultText = data.results || JSON.stringify(data.answers || []);
     const row = [
       data.studentName || '',
       data.completedAt || new Date().toISOString(),
@@ -25,10 +25,21 @@ function doPost(e) {
     } else {
       sheet.appendRow(row);
     }
-    return json_({ok: true});
+    return json_({ok: true, saved: true});
   } catch (error) {
     return json_({ok: false, error: String(error)});
   }
+}
+
+function processAiReview_(sheet, data) {
+  const aiResults = checkOpenAnswers_(data.answers || []);
+  const resultText = JSON.stringify(aiResults);
+  const rowNumber = findStudentRow_(sheet, data.studentName || '');
+  if (rowNumber > 0) {
+    sheet.getRange(rowNumber, 4).setValue(aiResults.filter(function(answer) { return answer.isCorrect; }).length);
+    sheet.getRange(rowNumber, 6).setValue(resultText);
+  }
+  return json_({ok: true, reviewed: true});
 }
 
 function getSheet_() {

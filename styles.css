@@ -7,6 +7,9 @@
 .modal-backdrop[hidden]{display:none!important}
 :root{--bg:#000;--panel:#070b08}
 html,body{background:#000!important}
-#matrix{background:#000}
+#matrix{background:#000;opacity:.08!important}
+.panel{background:rgba(3,6,4,.96)}
+html,body{background-color:#000!important}
+#matrix{background-color:#000!important;opacity:.04!important}
 .modal-backdrop{display:grid!important}
 .modal-backdrop[hidden]{display:none!important}
