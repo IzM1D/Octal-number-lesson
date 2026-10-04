@@ -15,7 +15,7 @@ function doPost(e) {
     const sheet = getSheet_();
     ensureHeaders_(sheet);
     if (data.action === 'ai-review') return processAiReview_(sheet, data);
-    const resultText = data.results || JSON.stringify(data.answers || []);
+    const resultText = data.results || formatResults_(data.answers || []);
     const row = [
       data.studentName || '',
       data.completedAt || new Date().toISOString(),
@@ -55,13 +55,25 @@ function parseRequest_(e) {
 
 function processAiReview_(sheet, data) {
   const aiResults = checkOpenAnswers_(data.answers || []);
-  const resultText = JSON.stringify(aiResults);
+  const resultText = formatResults_(aiResults);
   const rowNumber = findStudentRow_(sheet, data.studentName || '');
   if (rowNumber > 0) {
     sheet.getRange(rowNumber, 4).setValue(aiResults.filter(function(answer) { return answer.isCorrect; }).length);
     sheet.getRange(rowNumber, 6).setValue(resultText);
   }
   return json_({ok: true, reviewed: true});
+}
+
+function formatResults_(answers) {
+  return answers.map(function(answer) {
+    const status = answer.isCorrect ? 'ВЕРНО' : (answer.answerText || answer.answer ? 'ОШИБКА' : 'НЕТ ОТВЕТА');
+    return [
+      'Задание ' + answer.number + ': ' + answer.question,
+      'Ответ ученика: ' + (answer.answerText || answer.answer || 'нет ответа'),
+      'Правильный ответ: ' + (answer.correctText || answer.correct || 'не указан'),
+      'Результат: ' + status
+    ].join('\n');
+  }).join('\n\n');
 }
 
 function getSheet_() {
