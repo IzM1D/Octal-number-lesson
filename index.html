@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>Тест</title>
+  <meta property="og:title" content="Тест">
+  <meta name="twitter:title" content="Тест">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="matrix" aria-hidden="true"></canvas>
+  <main class="app-shell">
+    <form id="quizForm" novalidate>
+      <section class="identity panel">
+        <label for="studentName">ИМЯ ФАМИЛИЯ <span class="required">*</span></label>
+        <input id="studentName" name="studentName" type="text" autocomplete="name" placeholder="Введите имя и фамилию" required>
+        <p class="field-hint">Эти данные будут записаны вместе с результатом.</p>
+      </section>
+
+      <div id="quiz" aria-live="polite"></div>
+
+      <section class="submit-zone">
+        <div class="progress-line"><span id="progressText">0 из 19 отвечено</span><span id="progressPercent">0%</span></div>
+        <div class="progress-track"><span id="progressBar"></span></div>
+        <button class="finish-button" id="finishButton" type="button"><span>Завершить досрочно</span><span aria-hidden="true">↗</span></button>
+        <p class="submit-note">Ответы можно отправить в любой момент. Пропущенные задания будут отмечены в результатах.</p>
+      </section>
+    </form>
+
+    <section id="results" class="results panel" hidden></section>
+    <footer><span>ТЕСТ / учебный режим</span><span>LOCAL SESSION</span></footer>
+  </main>
+
+  <div id="confirmModal" class="modal-backdrop" hidden>
+    <div class="modal panel" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="modal-symbol">!</div>
+      <div><div class="section-kicker">ПОДТВЕРЖДЕНИЕ</div><h2 id="confirmTitle">Вы точно хотите завершить выполнение?</h2><p id="confirmText">Неотвеченные задания останутся без ответа.</p></div>
+      <div class="modal-actions"><button id="cancelFinish" class="button secondary" type="button">Нет, продолжить</button><button id="confirmFinish" class="button primary" type="button">Да, завершить</button></div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
