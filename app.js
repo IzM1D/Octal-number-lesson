@@ -1,4 +1,4 @@
-const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxMk_szuGn73oWQmXuuKIoKcsmt2tAcQcaqlM8iAUI1NkByKWdAtCmC42IuM-A_WfmY/exec";
+const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbycTP2doEDblMzdmckn_l-rmbmg_rEy-fs3jZQMO5E-rKXl7Wsan6eK683cGr5UZvZd/exec";
 const AI_BASE_URL = "http://111.228.46.150:3000/v1";
 const AI_API_KEY = "sk-BtsZuSh7mCzjwPmke9ZzuCqnJPOucf6KXfHrdrVtglpNjYdm";
 const AI_MODEL = "wj-interpret";
