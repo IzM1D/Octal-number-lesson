@@ -4,7 +4,14 @@ const AI_BASE_URL = 'http://111.228.46.150:3000/v1';
 const AI_API_KEY = 'sk-BtsZuSh7mCzjwPmke9ZzuCqnJPOucf6KXfHrdrVtglpNjYdm';
 const AI_MODEL = 'wj-interpret';
 
-function doGet() {
+function doGet(e) {
+  const params = e && e.parameter || {};
+  if (params.action === 'check') {
+    const exists = findStudentRow_(getSheet_(), params.studentName || '') > 0;
+    const result = JSON.stringify({ok: true, exists: exists});
+    if (params.callback) return ContentService.createTextOutput(params.callback + '(' + result + ');').setMimeType(ContentService.MimeType.JAVASCRIPT);
+    return json_({ok: true, exists: exists});
+  }
   return json_({ok: true, service: 'octal-quiz', sheet: SHEET_NAME});
 }
 
@@ -15,20 +22,21 @@ function doPost(e) {
     const sheet = getSheet_();
     ensureHeaders_(sheet);
     if (data.action === 'ai-review') return processAiReview_(sheet, data);
-    const resultText = data.results || formatResults_(data.answers || []);
     const row = [
       data.studentName || '',
       formatDate_(data.completedAt),
       data.variant || '',
       data.score || 0,
-      data.total || 19,
-      resultText
+      data.total || 19
     ];
-    const existing = findStudentRow_(sheet, data.studentName || '');
-    if (existing > 0) {
-      sheet.getRange(existing, 1, 1, row.length).setValues([row]);
-    } else {
+    (data.answers || []).forEach(function(answer) { row.push(formatAnswer_(answer)); });
+    const lock = LockService.getScriptLock();
+    lock.waitLock(10000);
+    try {
+      if (findStudentRow_(sheet, data.studentName) > 0) throw new Error('Ученик с таким именем и фамилией уже проходил тест');
       sheet.appendRow(row);
+    } finally {
+      lock.releaseLock();
     }
     SpreadsheetApp.flush();
     return json_({ok: true, saved: true});
@@ -55,25 +63,27 @@ function parseRequest_(e) {
 
 function processAiReview_(sheet, data) {
   const aiResults = checkOpenAnswers_(data.answers || []);
-  const resultText = formatResults_(aiResults);
   const rowNumber = findStudentRow_(sheet, data.studentName || '');
   if (rowNumber > 0) {
     sheet.getRange(rowNumber, 4).setValue(aiResults.filter(function(answer) { return answer.isCorrect; }).length);
-    sheet.getRange(rowNumber, 6).setValue(resultText);
+    aiResults.forEach(function(answer, index) { sheet.getRange(rowNumber, 6 + index).setValue(formatAnswer_(answer)); });
+    SpreadsheetApp.flush();
   }
   return json_({ok: true, reviewed: true});
 }
 
 function formatResults_(answers) {
-  return answers.map(function(answer) {
-    const status = answer.isCorrect ? 'ВЕРНО' : (answer.answerText || answer.answer ? 'ОШИБКА' : 'НЕТ ОТВЕТА');
-    return [
-      'Задание ' + answer.number + ': ' + answer.question,
-      'Ответ ученика: ' + (answer.answerText || answer.answer || 'нет ответа'),
-      'Правильный ответ: ' + (answer.correctText || answer.correct || 'не указан'),
-      'Результат: ' + status
-    ].join('\n');
-  }).join('\n\n');
+  return answers.map(formatAnswer_).join('\n\n');
+}
+
+function formatAnswer_(answer) {
+  const status = answer.isCorrect ? 'ВЕРНО' : (answer.answerText || answer.answer ? 'ОШИБКА' : 'НЕТ ОТВЕТА');
+  return [
+    'Вопрос: ' + answer.question,
+    'Ответ: ' + (answer.answerText || answer.answer || 'нет ответа'),
+    'Правильный ответ: ' + (answer.correctText || answer.correct || 'не указан'),
+    'Результат: ' + status
+  ].join('\n');
 }
 
 function formatDate_(value) {
@@ -89,9 +99,9 @@ function getSheet_() {
 }
 
 function ensureHeaders_(sheet) {
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(['Имя Фамилия', 'Время завершения', 'Вариант', 'Баллы', 'Всего заданий', 'Результаты']);
-  }
+  const headers = ['Имя Фамилия', 'Время завершения', 'Вариант', 'Баллы', 'Всего заданий'];
+  for (let i = 1; i <= 19; i++) headers.push('Задание ' + i);
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
 }
 
 function findStudentRow_(sheet, name) {
