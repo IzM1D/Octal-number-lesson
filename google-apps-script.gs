@@ -18,7 +18,7 @@ function doPost(e) {
     const resultText = data.results || formatResults_(data.answers || []);
     const row = [
       data.studentName || '',
-      data.completedAt || new Date().toISOString(),
+      formatDate_(data.completedAt),
       data.variant || '',
       data.score || 0,
       data.total || 19,
@@ -74,6 +74,12 @@ function formatResults_(answers) {
       'Результат: ' + status
     ].join('\n');
   }).join('\n\n');
+}
+
+function formatDate_(value) {
+  const date = value ? new Date(value) : new Date();
+  if (isNaN(date.getTime())) return String(value || '');
+  return Utilities.formatDate(date, Session.getScriptTimeZone(), 'dd.MM.yyyy HH:mm:ss');
 }
 
 function getSheet_() {
